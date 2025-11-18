@@ -696,6 +696,7 @@
         }
 
         .form-input {
+            width: 100%;
             padding: 15px;
             background: rgba(168, 216, 234, 0.1);
             border: 2px solid rgba(168, 216, 234, 0.3);
@@ -704,6 +705,12 @@
             font-size: 16px;
             font-family: 'Georgia', serif;
             transition: all 0.3s ease;
+        }
+
+        .form-input:disabled {
+            background: rgba(168, 216, 234, 0.05);
+            color: rgba(248, 249, 250, 0.5);
+            cursor: not-allowed;
         }
 
         .form-input:focus {
@@ -1458,6 +1465,35 @@
         let registeredUsers = JSON.parse(localStorage.getItem('moonshineUsers') || '{}');
         let currentProfilePicture = null;
 
+        // Check for saved session on page load
+        function checkSavedSession() {
+            const savedSession = localStorage.getItem('moonshineCurrentUser');
+            if (savedSession) {
+                try {
+                    currentUser = JSON.parse(savedSession);
+                    console.log('✓ Restored session for:', currentUser.name);
+                    updateUIForSignedInUser();
+                } catch (e) {
+                    console.error('Failed to restore session:', e);
+                    localStorage.removeItem('moonshineCurrentUser');
+                }
+            }
+        }
+
+        // Save session to localStorage
+        function saveSession() {
+            if (currentUser) {
+                localStorage.setItem('moonshineCurrentUser', JSON.stringify(currentUser));
+                console.log('✓ Session saved');
+            }
+        }
+
+        // Clear session from localStorage
+        function clearSession() {
+            localStorage.removeItem('moonshineCurrentUser');
+            console.log('✓ Session cleared');
+        }
+
         // Open Google Popup
         function openGooglePopup() {
             document.getElementById('googlePopupOverlay').classList.add('show');
@@ -1600,6 +1636,7 @@
             };
             
             console.log('✓ User signed in:', currentUser);
+            saveSession(); // Save session to localStorage
             closeGooglePopup();
             updateUIForSignedInUser();
         }
@@ -1618,6 +1655,7 @@
         // Sign out
         function signOut() {
             currentUser = null;
+            clearSession();
             updateUIForSignedOutUser();
             console.log('✓ User signed out');
         }
@@ -1848,44 +1886,22 @@
             }, 3000);
         }, 4000);
 
-        // Chat Functionality with Storage
+        // Chat Functionality with localStorage
         const chatMessages = document.getElementById('chatMessages');
         const messageInput = document.getElementById('messageInput');
         const usernameInput = document.getElementById('usernameInput');
         const sendBtn = document.getElementById('sendBtn');
 
-        // Load messages from storage
-        async function loadMessages() {
+        // Load messages from localStorage
+        function loadMessages() {
             try {
-                const result = await window.storage.list('msg:', true);
-                console.log('Loading messages, storage result:', result);
+                const messages = JSON.parse(localStorage.getItem('moonshineMessages') || '[]');
+                console.log('Loading', messages.length, 'messages from localStorage');
                 
-                if (result && result.keys && result.keys.length > 0) {
-                    const messages = [];
-                    
-                    for (const key of result.keys) {
-                        try {
-                            const data = await window.storage.get(key, true);
-                            if (data && data.value) {
-                                const parsed = JSON.parse(data.value);
-                                messages.push(parsed);
-                                console.log('Loaded message:', parsed);
-                            }
-                        } catch (e) {
-                            console.log('Skipping invalid message key:', key);
-                        }
-                    }
-                    
-                    messages.sort((a, b) => a.timestamp - b.timestamp);
-                    
-                    chatMessages.innerHTML = '';
-                    messages.forEach(msg => displayMessage(msg.user, msg.text, msg.time, false));
-                    console.log('Successfully loaded', messages.length, 'messages');
-                } else {
-                    console.log('No messages found in storage');
-                }
+                chatMessages.innerHTML = '';
+                messages.forEach(msg => displayMessage(msg.user, msg.text, msg.time, false));
             } catch (error) {
-                console.log('Error loading messages:', error.message);
+                console.error('Error loading messages:', error);
             }
         }
 
@@ -1909,8 +1925,8 @@
             return div.innerHTML;
         }
 
-        // Send message with storage
-        async function sendMessage() {
+        // Send message with localStorage
+        function sendMessage() {
             if (!currentUser) {
                 alert('Please sign in to send messages');
                 return;
@@ -1936,33 +1952,14 @@
                 displayMessage(username, message, time, false);
                 messageInput.value = '';
                 
-                // Store message with user ID for better organization
-                let attempts = 0;
-                let stored = false;
-                
-                while (!stored && attempts < 3) {
-                    try {
-                        const storageKey = `msg:${currentUser.id}:${timestamp}`;
-                        const result = await window.storage.set(storageKey, JSON.stringify(messageData), true);
-                        console.log('Message storage result:', result);
-                        
-                        if (result && result.key) {
-                            stored = true;
-                            console.log('✓ Message stored successfully!');
-                        } else {
-                            console.log('Storage returned null, retrying...');
-                            attempts++;
-                            await new Promise(resolve => setTimeout(resolve, 300));
-                        }
-                    } catch (error) {
-                        console.error('Storage attempt', attempts + 1, 'failed:', error.message);
-                        attempts++;
-                        await new Promise(resolve => setTimeout(resolve, 300));
-                    }
-                }
-                
-                if (!stored) {
-                    console.error('✗ Failed to store message after 3 attempts');
+                // Store in localStorage
+                try {
+                    const messages = JSON.parse(localStorage.getItem('moonshineMessages') || '[]');
+                    messages.push(messageData);
+                    localStorage.setItem('moonshineMessages', JSON.stringify(messages));
+                    console.log('✓ Message stored successfully! Total messages:', messages.length);
+                } catch (error) {
+                    console.error('✗ Failed to store message:', error);
                 }
             }
         }
@@ -1974,21 +1971,22 @@
             }
         });
 
-        // Load messages and keep refreshing
-        console.log('Starting message auto-refresh...');
+        // Load messages on page load
+        loadMessages();
+        
+        // Auto-refresh messages every 2 seconds to sync across tabs
         setInterval(() => {
             loadMessages();
-        }, 3000);
-        
-        // Initial load with delay to ensure storage is ready
-        setTimeout(() => {
-            console.log('Initial message load...');
-            loadMessages();
-        }, 1000);
+        }, 2000);
 
         // Initialize authentication on page load
         initGoogleSignIn();
-        updateUIForSignedOutUser();
+        checkSavedSession(); // Check if user was already signed in
+        
+        // If no saved session, show signed-out UI
+        if (!currentUser) {
+            updateUIForSignedOutUser();
+        }
 
         // Trading Functionality with Storage
         const tradesList = document.getElementById('tradesList');
