@@ -835,7 +835,270 @@
             gap: 20px;
         }
 
-        /* Google Sign In Button */
+        /* Google Sign In Popup */
+        .google-popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 10001;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .google-popup-overlay.show {
+            display: flex;
+        }
+
+        .google-popup {
+            background: white;
+            border-radius: 8px;
+            width: 450px;
+            max-width: 90%;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .popup-header {
+            padding: 24px 24px 0;
+            text-align: center;
+        }
+
+        .popup-google-logo {
+            width: 75px;
+            height: 24px;
+            margin-bottom: 16px;
+        }
+
+        .popup-title {
+            font-size: 24px;
+            color: #202124;
+            font-weight: 400;
+            margin-bottom: 8px;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+
+        .popup-subtitle {
+            font-size: 16px;
+            color: #5f6368;
+            margin-bottom: 24px;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+
+        .popup-body {
+            padding: 0 40px 36px;
+        }
+
+        .popup-tabs {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .popup-tab {
+            padding: 12px 0;
+            font-size: 14px;
+            color: #5f6368;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+
+        .popup-tab.active {
+            color: #1a73e8;
+            border-bottom-color: #1a73e8;
+        }
+
+        .popup-tab:hover {
+            color: #1a73e8;
+        }
+
+        .popup-form {
+            display: none;
+        }
+
+        .popup-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            color: #5f6368;
+            margin-bottom: 8px;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            font-size: 16px;
+            color: #202124;
+            transition: all 0.3s ease;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        }
+
+        .profile-upload {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .profile-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #f1f3f4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 2px solid #dadce0;
+        }
+
+        .profile-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-placeholder {
+            font-size: 36px;
+            color: #5f6368;
+        }
+
+        .upload-btn {
+            padding: 8px 24px;
+            background: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+
+        .upload-btn:hover {
+            background: #1765cc;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .popup-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 24px;
+        }
+
+        .popup-link {
+            font-size: 14px;
+            color: #1a73e8;
+            text-decoration: none;
+            cursor: pointer;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+
+        .popup-link:hover {
+            text-decoration: underline;
+        }
+
+        .popup-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .popup-btn {
+            padding: 10px 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+
+        .popup-btn-cancel {
+            background: transparent;
+            color: #1a73e8;
+        }
+
+        .popup-btn-cancel:hover {
+            background: rgba(26, 115, 232, 0.04);
+        }
+
+        .popup-btn-submit {
+            background: #1a73e8;
+            color: white;
+        }
+
+        .popup-btn-submit:hover {
+            background: #1765cc;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .popup-btn-submit:disabled {
+            background: #dadce0;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            color: #d93025;
+            font-size: 12px;
+            margin-top: 8px;
+            display: none;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            color: #1e8e3e;
+            font-size: 14px;
+            text-align: center;
+            padding: 12px;
+            background: #e6f4ea;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            display: none;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+
+        .success-message.show {
+            display: block;
+        }
         .google-signin-container {
             position: fixed;
             top: 80px;
@@ -1012,6 +1275,111 @@
         </ul>
     </nav>
 
+    <!-- Google Sign In -->
+    <div class="google-signin-container" id="googleSignInContainer">
+        <button class="google-signin-btn" onclick="openGooglePopup()">
+            <svg class="google-icon" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Sign in with Google
+        </button>
+    </div>
+
+    <!-- Google Sign In Popup -->
+    <div class="google-popup-overlay" id="googlePopupOverlay">
+        <div class="google-popup">
+            <div class="popup-header">
+                <svg class="popup-google-logo" viewBox="0 0 75 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    <path fill="#4285F4" d="M46.98 10.84c0-.79-.07-1.54-.19-2.27h-6.02v4.29h3.44c-.15.77-.6 1.43-1.28 1.87v2.5h2.07c1.21-1.12 1.91-2.77 1.91-4.73.07-.58.07-1.08.07-1.66z"/>
+                    <path fill="#34A853" d="M40.77 20.5c1.73 0 3.17-.57 4.23-1.54l-2.07-1.61c-.57.38-1.3.61-2.16.61-1.66 0-3.07-1.12-3.57-2.63h-2.14v1.65c1.06 2.1 3.24 3.52 5.71 3.52z"/>
+                    <path fill="#FBBC05" d="M37.2 15.33c-.13-.38-.2-.79-.2-1.21s.07-.83.2-1.21v-1.65h-2.14c-.44.88-.69 1.87-.69 2.91s.25 2.03.69 2.91l2.14-1.75z"/>
+                    <path fill="#EA4335" d="M40.77 8.29c.93 0 1.77.32 2.43.95l1.82-1.82c-1.1-1.03-2.54-1.66-4.25-1.66-2.47 0-4.65 1.42-5.71 3.52l2.14 1.66c.5-1.51 1.91-2.65 3.57-2.65z"/>
+                    <path fill="#4285F4" d="M68.5 10.84c0-.79-.07-1.54-.19-2.27h-6.02v4.29h3.44c-.15.77-.6 1.43-1.28 1.87v2.5h2.07c1.21-1.12 1.91-2.77 1.91-4.73.07-.58.07-1.08.07-1.66z"/>
+                    <path fill="#34A853" d="M62.29 20.5c1.73 0 3.17-.57 4.23-1.54l-2.07-1.61c-.57.38-1.3.61-2.16.61-1.66 0-3.07-1.12-3.57-2.63h-2.14v1.65c1.06 2.1 3.24 3.52 5.71 3.52z"/>
+                    <path fill="#FBBC05" d="M58.72 15.33c-.13-.38-.2-.79-.2-1.21s.07-.83.2-1.21v-1.65h-2.14c-.44.88-.69 1.87-.69 2.91s.25 2.03.69 2.91l2.14-1.75z"/>
+                    <path fill="#EA4335" d="M62.29 8.29c.93 0 1.77.32 2.43.95l1.82-1.82c-1.1-1.03-2.54-1.66-4.25-1.66-2.47 0-4.65 1.42-5.71 3.52l2.14 1.66c.5-1.51 1.91-2.65 3.57-2.65z"/>
+                </svg>
+                <h2 class="popup-title" id="popupTitle">Sign in</h2>
+                <p class="popup-subtitle">to continue to Moonshine</p>
+            </div>
+            <div class="popup-body">
+                <div class="popup-tabs">
+                    <div class="popup-tab active" onclick="switchTab('signin')">Sign In</div>
+                    <div class="popup-tab" onclick="switchTab('signup')">Create Account</div>
+                </div>
+
+                <div class="success-message" id="successMessage">Account created successfully! You can now sign in.</div>
+
+                <!-- Sign In Form -->
+                <form class="popup-form active" id="signinForm" onsubmit="handleSignIn(event)">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="signinEmail" required>
+                        <div class="error-message" id="signinError">Email or password is incorrect</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" id="signinPassword" required>
+                    </div>
+                    <div class="popup-actions">
+                        <a class="popup-link" onclick="alert('Demo mode - password reset not available')">Forgot password?</a>
+                        <div class="popup-buttons">
+                            <button type="button" class="popup-btn popup-btn-cancel" onclick="closeGooglePopup()">Cancel</button>
+                            <button type="submit" class="popup-btn popup-btn-submit">Sign In</button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Sign Up Form -->
+                <form class="popup-form" id="signupForm" onsubmit="handleSignUp(event)">
+                    <div class="profile-upload">
+                        <div class="profile-preview" id="profilePreview">
+                            <span class="profile-placeholder">👤</span>
+                        </div>
+                        <div>
+                            <button type="button" class="upload-btn" onclick="document.getElementById('profilePicture').click()">Upload Photo</button>
+                            <input type="file" id="profilePicture" class="file-input" accept="image/*" onchange="handleProfilePicture(event)">
+                            <p style="font-size: 12px; color: #5f6368; margin-top: 4px;">Optional</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-input" id="signupName" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="signupEmail" required>
+                        <div class="error-message" id="signupEmailError">This email is already registered</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" id="signupPassword" minlength="6" required>
+                        <div style="font-size: 12px; color: #5f6368; margin-top: 4px;">Use 6 or more characters</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Confirm Password</label>
+                        <input type="password" class="form-input" id="signupPasswordConfirm" required>
+                        <div class="error-message" id="passwordMatchError">Passwords do not match</div>
+                    </div>
+                    <div class="popup-actions">
+                        <span></span>
+                        <div class="popup-buttons">
+                            <button type="button" class="popup-btn popup-btn-cancel" onclick="closeGooglePopup()">Cancel</button>
+                            <button type="submit" class="popup-btn popup-btn-submit">Create Account</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Hero Section -->
     <section class="hero" id="home">
         <div class="hero-content">
@@ -1042,17 +1410,21 @@
     <!-- Trading Section -->
     <section class="trading-section" id="trades">
         <div class="trading-container">
+            <div class="auth-required-overlay" id="tradeAuthOverlay">
+                <div class="auth-message">🔒 Sign in with Google to post trades</div>
+                <button class="auth-signin-btn" onclick="signInWithGoogle()">Sign in with Google</button>
+            </div>
             <div class="trading-header">Trade Hub</div>
             <div class="trading-form">
                 <div class="form-row">
-                    <input type="text" class="form-input" id="tradeUsername" placeholder="Your Username" maxlength="20">
-                    <input type="text" class="form-input" id="tradeGame" placeholder="Game (e.g. Adopt Me)" maxlength="30">
+                    <input type="text" class="form-input" id="tradeUsername" placeholder="Your Username" maxlength="20" disabled>
+                    <input type="text" class="form-input" id="tradeGame" placeholder="Game (e.g. Adopt Me)" maxlength="30" disabled>
                 </div>
                 <div class="form-row">
-                    <input type="text" class="form-input" id="tradeOffering" placeholder="What you're offering" maxlength="100">
-                    <input type="text" class="form-input" id="tradeSeeking" placeholder="What you're seeking" maxlength="100">
+                    <input type="text" class="form-input" id="tradeOffering" placeholder="What you're offering" maxlength="100" disabled>
+                    <input type="text" class="form-input" id="tradeSeeking" placeholder="What you're seeking" maxlength="100" disabled>
                 </div>
-                <button class="post-trade-btn" id="postTradeBtn">Post Trade</button>
+                <button class="post-trade-btn" id="postTradeBtn" disabled>Post Trade</button>
             </div>
             <div class="trades-list" id="tradesList"></div>
         </div>
@@ -1061,12 +1433,16 @@
     <!-- Chat Section -->
     <section class="chat-section" id="chat">
         <div class="chat-container">
+            <div class="auth-required-overlay" id="chatAuthOverlay">
+                <div class="auth-message">🔒 Sign in with Google to use the chat</div>
+                <button class="auth-signin-btn" onclick="signInWithGoogle()">Sign in with Google</button>
+            </div>
             <div class="chat-header">Community Chat</div>
             <div class="chat-messages" id="chatMessages"></div>
             <div class="chat-input-container">
-                <input type="text" class="chat-username-input" id="usernameInput" placeholder="Your name..." maxlength="20">
-                <input type="text" class="chat-input" id="messageInput" placeholder="Type your message..." maxlength="500">
-                <button class="chat-send-btn" id="sendBtn">Send</button>
+                <input type="text" class="chat-username-input" id="usernameInput" placeholder="Your name..." maxlength="20" disabled>
+                <input type="text" class="chat-input" id="messageInput" placeholder="Sign in to chat..." maxlength="500" disabled>
+                <button class="chat-send-btn" id="sendBtn" disabled>Send</button>
             </div>
         </div>
     </section>
@@ -1077,6 +1453,236 @@
     </footer>
 
     <script>
+        // Google Authentication State
+        let currentUser = null;
+        let registeredUsers = JSON.parse(localStorage.getItem('moonshineUsers') || '{}');
+        let currentProfilePicture = null;
+
+        // Open Google Popup
+        function openGooglePopup() {
+            document.getElementById('googlePopupOverlay').classList.add('show');
+            document.getElementById('successMessage').classList.remove('show');
+            resetForms();
+        }
+
+        // Close Google Popup
+        function closeGooglePopup() {
+            document.getElementById('googlePopupOverlay').classList.remove('show');
+            resetForms();
+        }
+
+        // Close popup when clicking outside
+        document.getElementById('googlePopupOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeGooglePopup();
+            }
+        });
+
+        // Switch between Sign In and Sign Up tabs
+        function switchTab(tab) {
+            const tabs = document.querySelectorAll('.popup-tab');
+            const forms = document.querySelectorAll('.popup-form');
+            
+            tabs.forEach(t => t.classList.remove('active'));
+            forms.forEach(f => f.classList.remove('active'));
+            
+            if (tab === 'signin') {
+                tabs[0].classList.add('active');
+                forms[0].classList.add('active');
+                document.getElementById('popupTitle').textContent = 'Sign in';
+            } else {
+                tabs[1].classList.add('active');
+                forms[1].classList.add('active');
+                document.getElementById('popupTitle').textContent = 'Create your Account';
+            }
+            
+            resetForms();
+        }
+
+        // Reset forms
+        function resetForms() {
+            document.getElementById('signinForm').reset();
+            document.getElementById('signupForm').reset();
+            document.getElementById('signinError').classList.remove('show');
+            document.getElementById('signupEmailError').classList.remove('show');
+            document.getElementById('passwordMatchError').classList.remove('show');
+            currentProfilePicture = null;
+            document.getElementById('profilePreview').innerHTML = '<span class="profile-placeholder">👤</span>';
+        }
+
+        // Handle profile picture upload
+        function handleProfilePicture(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentProfilePicture = e.target.result;
+                    document.getElementById('profilePreview').innerHTML = `<img src="${currentProfilePicture}" alt="Profile">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Handle Sign Up
+        function handleSignUp(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim().toLowerCase();
+            const password = document.getElementById('signupPassword').value;
+            const passwordConfirm = document.getElementById('signupPasswordConfirm').value;
+            
+            // Reset errors
+            document.getElementById('signupEmailError').classList.remove('show');
+            document.getElementById('passwordMatchError').classList.remove('show');
+            
+            // Check if email already exists
+            if (registeredUsers[email]) {
+                document.getElementById('signupEmailError').classList.add('show');
+                return;
+            }
+            
+            // Check if passwords match
+            if (password !== passwordConfirm) {
+                document.getElementById('passwordMatchError').classList.add('show');
+                return;
+            }
+            
+            // Create new user
+            const userId = 'user_' + Date.now();
+            registeredUsers[email] = {
+                id: userId,
+                name: name,
+                email: email,
+                password: password, // In production, this should be hashed!
+                picture: currentProfilePicture || 'https://cdn3.emoji.gg/emojis/27587-shinyvaporeon.gif',
+                createdAt: new Date().toISOString()
+            };
+            
+            // Save to localStorage
+            localStorage.setItem('moonshineUsers', JSON.stringify(registeredUsers));
+            
+            console.log('✓ Account created successfully!', registeredUsers[email]);
+            
+            // Show success message
+            document.getElementById('successMessage').classList.add('show');
+            
+            // Switch to sign in tab after 2 seconds
+            setTimeout(() => {
+                switchTab('signin');
+                document.getElementById('signinEmail').value = email;
+            }, 2000);
+        }
+
+        // Handle Sign In
+        function handleSignIn(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('signinEmail').value.trim().toLowerCase();
+            const password = document.getElementById('signinPassword').value;
+            
+            // Reset error
+            document.getElementById('signinError').classList.remove('show');
+            
+            // Check credentials
+            const user = registeredUsers[email];
+            if (!user || user.password !== password) {
+                document.getElementById('signinError').classList.add('show');
+                return;
+            }
+            
+            // Sign in successful
+            currentUser = {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                picture: user.picture
+            };
+            
+            console.log('✓ User signed in:', currentUser);
+            closeGooglePopup();
+            updateUIForSignedInUser();
+        }
+
+        // Initialize Google Sign-In
+        function initGoogleSignIn() {
+            console.log('Google Sign-In initialized');
+            console.log('Registered users:', Object.keys(registeredUsers).length);
+        }
+
+        // Sign in with Google (original function for compatibility)
+        async function signInWithGoogle() {
+            openGooglePopup();
+        }
+
+        // Sign out
+        function signOut() {
+            currentUser = null;
+            updateUIForSignedOutUser();
+            console.log('✓ User signed out');
+        }
+
+        // Update UI for signed-in user
+        function updateUIForSignedInUser() {
+            const signInContainer = document.getElementById('googleSignInContainer');
+            signInContainer.innerHTML = `
+                <div class="user-profile">
+                    <img src="${currentUser.picture}" class="user-avatar" alt="User">
+                    <span>${currentUser.name}</span>
+                    <button class="signout-btn" onclick="signOut()">Sign Out</button>
+                </div>
+            `;
+            
+            // Enable chat
+            document.getElementById('chatAuthOverlay').classList.remove('show');
+            document.getElementById('usernameInput').disabled = false;
+            document.getElementById('usernameInput').value = currentUser.name;
+            document.getElementById('messageInput').disabled = false;
+            document.getElementById('messageInput').placeholder = 'Type your message...';
+            document.getElementById('sendBtn').disabled = false;
+            
+            // Enable trading
+            document.getElementById('tradeAuthOverlay').classList.remove('show');
+            document.getElementById('tradeUsername').disabled = false;
+            document.getElementById('tradeUsername').value = currentUser.name;
+            document.getElementById('tradeGame').disabled = false;
+            document.getElementById('tradeOffering').disabled = false;
+            document.getElementById('tradeSeeking').disabled = false;
+            document.getElementById('postTradeBtn').disabled = false;
+        }
+
+        // Update UI for signed-out user
+        function updateUIForSignedOutUser() {
+            const signInContainer = document.getElementById('googleSignInContainer');
+            signInContainer.innerHTML = `
+                <button class="google-signin-btn" onclick="openGooglePopup()">
+                    <svg class="google-icon" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Sign in with Google
+                </button>
+            `;
+            
+            // Disable and show overlays
+            document.getElementById('chatAuthOverlay').classList.add('show');
+            document.getElementById('usernameInput').disabled = true;
+            document.getElementById('usernameInput').value = '';
+            document.getElementById('messageInput').disabled = true;
+            document.getElementById('messageInput').placeholder = 'Sign in to chat...';
+            document.getElementById('sendBtn').disabled = true;
+            
+            document.getElementById('tradeAuthOverlay').classList.add('show');
+            document.getElementById('tradeUsername').disabled = true;
+            document.getElementById('tradeUsername').value = '';
+            document.getElementById('tradeGame').disabled = true;
+            document.getElementById('tradeOffering').disabled = true;
+            document.getElementById('tradeSeeking').disabled = true;
+            document.getElementById('postTradeBtn').disabled = true;
+        }
+
         // Anti-theft protection
         (function() {
             // Scroll to top on page load
@@ -1305,7 +1911,12 @@
 
         // Send message with storage
         async function sendMessage() {
-            const username = usernameInput.value.trim() || 'Anonymous';
+            if (!currentUser) {
+                alert('Please sign in to send messages');
+                return;
+            }
+            
+            const username = currentUser.name;
             const message = messageInput.value.trim();
             
             if (message) {
@@ -1315,6 +1926,7 @@
                 
                 const messageData = {
                     user: username,
+                    userId: currentUser.id,
                     text: message,
                     time: time,
                     timestamp: timestamp
@@ -1324,28 +1936,19 @@
                 displayMessage(username, message, time, false);
                 messageInput.value = '';
                 
-                // Store message with retry
+                // Store message with user ID for better organization
                 let attempts = 0;
                 let stored = false;
                 
                 while (!stored && attempts < 3) {
                     try {
-                        const result = await window.storage.set(`msg:${timestamp}`, JSON.stringify(messageData), true);
+                        const storageKey = `msg:${currentUser.id}:${timestamp}`;
+                        const result = await window.storage.set(storageKey, JSON.stringify(messageData), true);
                         console.log('Message storage result:', result);
                         
                         if (result && result.key) {
                             stored = true;
                             console.log('✓ Message stored successfully!');
-                            
-                            // Verify it was stored
-                            setTimeout(async () => {
-                                try {
-                                    const verify = await window.storage.get(`msg:${timestamp}`, true);
-                                    console.log('Verification check:', verify ? '✓ Message verified in storage' : '✗ Message not found');
-                                } catch (e) {
-                                    console.log('Verification failed:', e.message);
-                                }
-                            }, 500);
                         } else {
                             console.log('Storage returned null, retrying...');
                             attempts++;
@@ -1360,7 +1963,6 @@
                 
                 if (!stored) {
                     console.error('✗ Failed to store message after 3 attempts');
-                    alert('Message may not be saved. Please try again.');
                 }
             }
         }
@@ -1383,6 +1985,10 @@
             console.log('Initial message load...');
             loadMessages();
         }, 1000);
+
+        // Initialize authentication on page load
+        initGoogleSignIn();
+        updateUIForSignedOutUser();
 
         // Trading Functionality with Storage
         const tradesList = document.getElementById('tradesList');
@@ -1454,7 +2060,12 @@
 
         // Post trade
         async function postTrade() {
-            const username = tradeUsername.value.trim() || 'Anonymous';
+            if (!currentUser) {
+                alert('Please sign in to post trades');
+                return;
+            }
+            
+            const username = currentUser.name;
             const game = tradeGame.value.trim() || 'Roblox Game';
             const offering = tradeOffering.value.trim();
             const seeking = tradeSeeking.value.trim();
@@ -1466,6 +2077,7 @@
                 
                 const tradeData = {
                     user: username,
+                    userId: currentUser.id,
                     game: game,
                     offering: offering,
                     seeking: seeking,
@@ -1479,28 +2091,19 @@
                 tradeSeeking.value = '';
                 playClickSound();
                 
-                // Store trade with retry
+                // Store trade with user ID
                 let attempts = 0;
                 let stored = false;
                 
                 while (!stored && attempts < 3) {
                     try {
-                        const result = await window.storage.set(`trade:${timestamp}`, JSON.stringify(tradeData), true);
+                        const storageKey = `trade:${currentUser.id}:${timestamp}`;
+                        const result = await window.storage.set(storageKey, JSON.stringify(tradeData), true);
                         console.log('Trade storage result:', result);
                         
                         if (result && result.key) {
                             stored = true;
                             console.log('✓ Trade stored successfully!');
-                            
-                            // Verify it was stored
-                            setTimeout(async () => {
-                                try {
-                                    const verify = await window.storage.get(`trade:${timestamp}`, true);
-                                    console.log('Verification check:', verify ? '✓ Trade verified in storage' : '✗ Trade not found');
-                                } catch (e) {
-                                    console.log('Verification failed:', e.message);
-                                }
-                            }, 500);
                         } else {
                             console.log('Storage returned null, retrying...');
                             attempts++;
@@ -1515,7 +2118,6 @@
                 
                 if (!stored) {
                     console.error('✗ Failed to store trade after 3 attempts');
-                    alert('Trade may not be saved. Please try again.');
                 }
             }
         }
