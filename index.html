@@ -876,7 +876,7 @@
     </div>
 
     <!-- Video Background -->
-    <video id="bg-video" autoplay loop muted playsinline>
+    <video id="bg-video" autoplay loop muted playsinline preload="auto">
         <source src="https://files.catbox.moe/27bu3f.mp4" type="video/mp4">
     </video>
 
@@ -979,19 +979,20 @@
                 }
             });
 
-            // Detect DevTools
-            const devtools = { open: false };
-            const threshold = 160;
-            
-            setInterval(() => {
-                if (window.outerWidth - window.innerWidth > threshold || 
-                    window.outerHeight - window.innerHeight > threshold) {
-                    if (!devtools.open) {
-                        devtools.open = true;
-                        document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-size:48px;color:#A8D8EA;background:#000;">Access Denied</div>';
-                    }
-                }
-            }, 500);
+            // Detect DevTools - REMOVED TO PREVENT "ACCESS DENIED" MESSAGE
+            // This was blocking users who had their browser window resized
+            // const devtools = { open: false };
+            // const threshold = 160;
+            // 
+            // setInterval(() => {
+            //     if (window.outerWidth - window.innerWidth > threshold || 
+            //         window.outerHeight - window.innerHeight > threshold) {
+            //         if (!devtools.open) {
+            //             devtools.open = true;
+            //             document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-size:48px;color:#A8D8EA;background:#000;">Access Denied</div>';
+            //         }
+            //     }
+            // }, 500);
 
             // Clear console
             if (window.console && typeof console.clear === 'function') {
@@ -1004,6 +1005,36 @@
         const loadingBar = document.getElementById('loadingBar');
         const loadingWind = document.getElementById('loadingWind');
         const video = document.getElementById('bg-video');
+
+        // Start video immediately with audio
+        video.muted = false;
+        video.volume = 1.0;
+        video.play().catch(e => {
+            console.log('Video autoplay with audio prevented, will unmute after user interaction:', e);
+            // If autoplay with audio fails, try muted first then unmute
+            video.muted = true;
+            video.play().then(() => {
+                // Unmute after playing starts
+                setTimeout(() => {
+                    video.muted = false;
+                    video.volume = 1.0;
+                }, 100);
+            });
+        });
+
+        // Prevent video freezing
+        video.addEventListener('pause', () => {
+            video.play().catch(e => console.log('Video play error:', e));
+        });
+
+        video.addEventListener('ended', () => {
+            video.play().catch(e => console.log('Video play error:', e));
+        });
+
+        video.addEventListener('stalled', () => {
+            video.load();
+            video.play().catch(e => console.log('Video play error:', e));
+        });
 
         // Generate wind particles around loading bar
         for (let i = 0; i < 30; i++) {
@@ -1026,20 +1057,34 @@
                 clearInterval(loadingInterval);
                 setTimeout(() => {
                     loadingScreen.classList.add('hidden');
+                    // Ensure video is playing with full audio
                     video.muted = false;
                     video.volume = 1.0;
+                    video.play().catch(e => console.log('Video play error:', e));
                 }, 500);
             }
             loadingBar.style.width = progress + '%';
         }, 200);
 
-        // Enable video sound after loading
-        video.addEventListener('canplaythrough', () => {
-            if (progress >= 100) {
+        // Ensure video plays with audio through loading
+        video.addEventListener('canplay', () => {
+            video.muted = false;
+            video.volume = 1.0;
+            video.play().catch(e => console.log('Video play error:', e));
+        });
+
+        // Keep video playing and prevent freezing
+        setInterval(() => {
+            if (video.paused) {
+                video.play().catch(e => console.log('Video play error:', e));
+            }
+            if (video.muted) {
                 video.muted = false;
+            }
+            if (video.volume !== 1.0) {
                 video.volume = 1.0;
             }
-        });
+        }, 1000);
 
         // Generate Starfield
         const starsContainer = document.getElementById('stars');
