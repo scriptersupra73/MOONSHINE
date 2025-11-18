@@ -415,14 +415,13 @@
             box-shadow: 0 20px 60px rgba(168, 216, 234, 0.2);
             opacity: 0;
             transform: translateY(100px) scale(0.9);
-            transition: all 1s ease-out;
+            transition: opacity 1s ease-out, transform 0.1s ease-out;
             transform-style: preserve-3d;
             perspective: 1000px;
         }
 
         .about-content.visible {
             opacity: 1;
-            transform: translateY(0) scale(1) translateZ(0);
         }
 
         .about h2 {
@@ -878,7 +877,7 @@
 
     <!-- Video Background -->
     <video id="bg-video" autoplay loop muted playsinline>
-        <source src="https://files.catbox.moe/lme9kb.mp4" type="video/mp4">
+        <source src="https://files.catbox.moe/27bu3f.mp4" type="video/mp4">
     </video>
 
     <!-- Starfield Background -->
@@ -962,6 +961,9 @@
     <script>
         // Anti-theft protection
         (function() {
+            // Scroll to top on page load
+            window.scrollTo(0, 0);
+            
             // Disable right-click
             document.addEventListener('contextmenu', e => e.preventDefault());
             
@@ -1083,48 +1085,34 @@
         const usernameInput = document.getElementById('usernameInput');
         const sendBtn = document.getElementById('sendBtn');
 
-        // Load messages from storage with retry
+        // Load messages from storage
         async function loadMessages() {
-            let retries = 0;
-            const maxRetries = 5;
-            
-            while (retries < maxRetries) {
-                try {
-                    const result = await window.storage.list('msg:', true);
-                    console.log('Storage list result:', result);
-                    
-                    if (result && result.keys && result.keys.length > 0) {
-                        const messagePromises = result.keys.map(async key => {
-                            try {
-                                const data = await window.storage.get(key, true);
-                                console.log('Retrieved message:', key, data);
-                                return data ? JSON.parse(data.value) : null;
-                            } catch (e) {
-                                console.error('Error getting message:', key, e);
-                                return null;
-                            }
-                        });
-                        
-                        const messages = (await Promise.all(messagePromises))
-                            .filter(msg => msg !== null)
-                            .sort((a, b) => a.timestamp - b.timestamp);
-                        
-                        console.log('Loaded messages:', messages);
-                        chatMessages.innerHTML = '';
-                        messages.forEach(msg => displayMessage(msg.user, msg.text, msg.time, false));
-                        return;
-                    } else {
-                        console.log('No messages found, attempt', retries + 1);
-                    }
-                } catch (error) {
-                    console.error('Loading messages error (attempt ' + (retries + 1) + '):', error);
-                }
+            try {
+                const result = await window.storage.list('msg:', true);
                 
-                retries++;
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                if (result && result.keys && result.keys.length > 0) {
+                    const messagePromises = result.keys.map(async key => {
+                        try {
+                            const data = await window.storage.get(key, true);
+                            return data ? JSON.parse(data.value) : null;
+                        } catch (e) {
+                            // Key doesn't exist yet, skip it
+                            return null;
+                        }
+                    });
+                    
+                    const messages = (await Promise.all(messagePromises))
+                        .filter(msg => msg !== null)
+                        .sort((a, b) => a.timestamp - b.timestamp);
+                    
+                    chatMessages.innerHTML = '';
+                    messages.forEach(msg => displayMessage(msg.user, msg.text, msg.time, false));
+                    console.log('Loaded', messages.length, 'messages');
+                }
+            } catch (error) {
+                // Storage might not be ready yet, this is normal on first load
+                console.log('Storage not ready yet:', error.message);
             }
-            
-            console.log('Finished loading attempts');
         }
 
         // Display message
@@ -1147,7 +1135,7 @@
             return div.innerHTML;
         }
 
-        // Send message with guaranteed storage
+        // Send message with storage
         async function sendMessage() {
             const username = usernameInput.value.trim() || 'Anonymous';
             const message = messageInput.value.trim();
@@ -1165,30 +1153,15 @@
                 };
                 
                 displayMessage(username, message, time, false);
-                
-                // Retry storage until successful
-                let stored = false;
-                let attempts = 0;
-                while (!stored && attempts < 5) {
-                    try {
-                        const result = await window.storage.set(`msg:${timestamp}`, JSON.stringify(messageData), true);
-                        console.log('Message stored:', result);
-                        if (result && result.key) {
-                            stored = true;
-                            console.log('Successfully saved message');
-                        }
-                    } catch (error) {
-                        console.error('Storage attempt ' + (attempts + 1) + ' failed:', error);
-                        attempts++;
-                        await new Promise(resolve => setTimeout(resolve, 500));
-                    }
-                }
-                
-                if (!stored) {
-                    console.error('Failed to store message after all attempts');
-                }
-                
                 messageInput.value = '';
+                
+                // Store message
+                try {
+                    const result = await window.storage.set(`msg:${timestamp}`, JSON.stringify(messageData), true);
+                    console.log('Message stored successfully:', result);
+                } catch (error) {
+                    console.error('Failed to store message:', error);
+                }
             }
         }
 
@@ -1199,12 +1172,11 @@
             }
         });
 
-        // Load messages multiple times to ensure they load
-        window.addEventListener('load', () => {
-            setTimeout(loadMessages, 500);
-            setTimeout(loadMessages, 2000);
-            setTimeout(loadMessages, 4000);
-        });
+        // Load messages and keep refreshing
+        setInterval(() => {
+            loadMessages();
+        }, 3000);
+        
         loadMessages();
 
         // Trading Functionality with Storage
@@ -1217,45 +1189,32 @@
 
         // Load trades from storage
         async function loadTrades() {
-            let retries = 0;
-            const maxRetries = 5;
-            
-            while (retries < maxRetries) {
-                try {
-                    const result = await window.storage.list('trade:', true);
-                    console.log('Trades list result:', result);
-                    
-                    if (result && result.keys && result.keys.length > 0) {
-                        const tradePromises = result.keys.map(async key => {
-                            try {
-                                const data = await window.storage.get(key, true);
-                                return data ? JSON.parse(data.value) : null;
-                            } catch (e) {
-                                console.error('Error getting trade:', key, e);
-                                return null;
-                            }
-                        });
-                        
-                        const trades = (await Promise.all(tradePromises))
-                            .filter(trade => trade !== null)
-                            .sort((a, b) => b.timestamp - a.timestamp);
-                        
-                        console.log('Loaded trades:', trades);
-                        tradesList.innerHTML = '';
-                        trades.forEach(trade => displayTrade(trade));
-                        return;
-                    } else {
-                        console.log('No trades found, attempt', retries + 1);
-                    }
-                } catch (error) {
-                    console.error('Loading trades error (attempt ' + (retries + 1) + '):', error);
-                }
+            try {
+                const result = await window.storage.list('trade:', true);
                 
-                retries++;
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                if (result && result.keys && result.keys.length > 0) {
+                    const tradePromises = result.keys.map(async key => {
+                        try {
+                            const data = await window.storage.get(key, true);
+                            return data ? JSON.parse(data.value) : null;
+                        } catch (e) {
+                            // Key doesn't exist yet, skip it
+                            return null;
+                        }
+                    });
+                    
+                    const trades = (await Promise.all(tradePromises))
+                        .filter(trade => trade !== null)
+                        .sort((a, b) => b.timestamp - a.timestamp);
+                    
+                    tradesList.innerHTML = '';
+                    trades.forEach(trade => displayTrade(trade));
+                    console.log('Loaded', trades.length, 'trades');
+                }
+            } catch (error) {
+                // Storage might not be ready yet, this is normal on first load
+                console.log('Storage not ready yet:', error.message);
             }
-            
-            console.log('Finished loading trade attempts');
         }
 
         // Display trade
@@ -1267,7 +1226,7 @@
                     <div class="trade-user">${escapeHtml(trade.user)}</div>
                     <div class="trade-time">${trade.time}</div>
                 </div>
-                <div class="trade-game">🎮 ${escapeHtml(trade.game)}</div>
+                <div class="trade-game">${escapeHtml(trade.game)}</div>
                 <div class="trade-details">
                     <div class="trade-offering">
                         <div class="trade-label">Offering</div>
@@ -1305,31 +1264,17 @@
                 };
                 
                 displayTrade(tradeData);
-                
-                let stored = false;
-                let attempts = 0;
-                while (!stored && attempts < 5) {
-                    try {
-                        const result = await window.storage.set(`trade:${timestamp}`, JSON.stringify(tradeData), true);
-                        console.log('Trade stored:', result);
-                        if (result && result.key) {
-                            stored = true;
-                            console.log('Successfully saved trade');
-                        }
-                    } catch (error) {
-                        console.error('Storage attempt ' + (attempts + 1) + ' failed:', error);
-                        attempts++;
-                        await new Promise(resolve => setTimeout(resolve, 500));
-                    }
-                }
-                
-                if (!stored) {
-                    console.error('Failed to store trade after all attempts');
-                }
-                
                 tradeOffering.value = '';
                 tradeSeeking.value = '';
                 playClickSound();
+                
+                // Store trade
+                try {
+                    const result = await window.storage.set(`trade:${timestamp}`, JSON.stringify(tradeData), true);
+                    console.log('Trade stored successfully:', result);
+                } catch (error) {
+                    console.error('Failed to store trade:', error);
+                }
             }
         }
 
@@ -1341,12 +1286,11 @@
             if (e.key === 'Enter') postTrade();
         });
 
-        // Load trades on page load
-        window.addEventListener('load', () => {
-            setTimeout(loadTrades, 1000);
-            setTimeout(loadTrades, 2500);
-            setTimeout(loadTrades, 5000);
-        });
+        // Load trades and keep refreshing
+        setInterval(() => {
+            loadTrades();
+        }, 3000);
+        
         loadTrades();
 
         // Sound effects
