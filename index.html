@@ -1134,29 +1134,34 @@
         async function loadMessages() {
             try {
                 const result = await window.storage.list('msg:', true);
+                console.log('Loading messages, storage result:', result);
                 
                 if (result && result.keys && result.keys.length > 0) {
-                    const messagePromises = result.keys.map(async key => {
+                    const messages = [];
+                    
+                    for (const key of result.keys) {
                         try {
                             const data = await window.storage.get(key, true);
-                            return data ? JSON.parse(data.value) : null;
+                            if (data && data.value) {
+                                const parsed = JSON.parse(data.value);
+                                messages.push(parsed);
+                                console.log('Loaded message:', parsed);
+                            }
                         } catch (e) {
-                            // Key doesn't exist yet, skip it
-                            return null;
+                            console.log('Skipping invalid message key:', key);
                         }
-                    });
+                    }
                     
-                    const messages = (await Promise.all(messagePromises))
-                        .filter(msg => msg !== null)
-                        .sort((a, b) => a.timestamp - b.timestamp);
+                    messages.sort((a, b) => a.timestamp - b.timestamp);
                     
                     chatMessages.innerHTML = '';
                     messages.forEach(msg => displayMessage(msg.user, msg.text, msg.time, false));
-                    console.log('Loaded', messages.length, 'messages');
+                    console.log('Successfully loaded', messages.length, 'messages');
+                } else {
+                    console.log('No messages found in storage');
                 }
             } catch (error) {
-                // Storage might not be ready yet, this is normal on first load
-                console.log('Storage not ready yet:', error.message);
+                console.log('Error loading messages:', error.message);
             }
         }
 
@@ -1197,15 +1202,47 @@
                     timestamp: timestamp
                 };
                 
+                console.log('Sending message:', messageData);
                 displayMessage(username, message, time, false);
                 messageInput.value = '';
                 
-                // Store message
-                try {
-                    const result = await window.storage.set(`msg:${timestamp}`, JSON.stringify(messageData), true);
-                    console.log('Message stored successfully:', result);
-                } catch (error) {
-                    console.error('Failed to store message:', error);
+                // Store message with retry
+                let attempts = 0;
+                let stored = false;
+                
+                while (!stored && attempts < 3) {
+                    try {
+                        const result = await window.storage.set(`msg:${timestamp}`, JSON.stringify(messageData), true);
+                        console.log('Message storage result:', result);
+                        
+                        if (result && result.key) {
+                            stored = true;
+                            console.log('✓ Message stored successfully!');
+                            
+                            // Verify it was stored
+                            setTimeout(async () => {
+                                try {
+                                    const verify = await window.storage.get(`msg:${timestamp}`, true);
+                                    console.log('Verification check:', verify ? '✓ Message verified in storage' : '✗ Message not found');
+                                } catch (e) {
+                                    console.log('Verification failed:', e.message);
+                                }
+                            }, 500);
+                        } else {
+                            console.log('Storage returned null, retrying...');
+                            attempts++;
+                            await new Promise(resolve => setTimeout(resolve, 300));
+                        }
+                    } catch (error) {
+                        console.error('Storage attempt', attempts + 1, 'failed:', error.message);
+                        attempts++;
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                    }
+                }
+                
+                if (!stored) {
+                    console.error('✗ Failed to store message after 3 attempts');
+                    alert('Message may not be saved. Please try again.');
                 }
             }
         }
@@ -1218,11 +1255,16 @@
         });
 
         // Load messages and keep refreshing
+        console.log('Starting message auto-refresh...');
         setInterval(() => {
             loadMessages();
         }, 3000);
         
-        loadMessages();
+        // Initial load with delay to ensure storage is ready
+        setTimeout(() => {
+            console.log('Initial message load...');
+            loadMessages();
+        }, 1000);
 
         // Trading Functionality with Storage
         const tradesList = document.getElementById('tradesList');
