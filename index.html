@@ -835,7 +835,125 @@
             gap: 20px;
         }
 
-        /* Cursor Trail Effect */
+        /* Google Sign In Button */
+        .google-signin-container {
+            position: fixed;
+            top: 80px;
+            right: 50px;
+            z-index: 1000;
+            animation: slideDown 0.8s ease-out 0.3s both;
+        }
+
+        .google-signin-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: white;
+            color: #333;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            font-family: 'Georgia', serif;
+        }
+
+        .google-signin-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .google-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(168, 216, 234, 0.3);
+            border-radius: 25px;
+            color: var(--pastel-blue);
+            font-weight: 600;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid var(--pastel-blue);
+        }
+
+        .signout-btn {
+            padding: 8px 16px;
+            background: rgba(255, 59, 48, 0.8);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Georgia', serif;
+        }
+
+        .signout-btn:hover {
+            background: rgba(255, 59, 48, 1);
+            transform: scale(1.05);
+        }
+
+        .auth-required-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 20px;
+            border-radius: 30px;
+        }
+
+        .auth-required-overlay.show {
+            display: flex;
+        }
+
+        .auth-message {
+            color: var(--pastel-blue);
+            font-size: 20px;
+            text-align: center;
+            padding: 0 40px;
+        }
+
+        .auth-signin-btn {
+            padding: 15px 40px;
+            background: white;
+            color: #333;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(168, 216, 234, 0.5);
+            font-family: 'Georgia', serif;
+        }
+
+        .auth-signin-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 30px rgba(168, 216, 234, 0.7);
+        }
         .cursor-trail {
             position: fixed;
             width: 20px;
@@ -1278,29 +1396,34 @@
         async function loadTrades() {
             try {
                 const result = await window.storage.list('trade:', true);
+                console.log('Loading trades, storage result:', result);
                 
                 if (result && result.keys && result.keys.length > 0) {
-                    const tradePromises = result.keys.map(async key => {
+                    const trades = [];
+                    
+                    for (const key of result.keys) {
                         try {
                             const data = await window.storage.get(key, true);
-                            return data ? JSON.parse(data.value) : null;
+                            if (data && data.value) {
+                                const parsed = JSON.parse(data.value);
+                                trades.push(parsed);
+                                console.log('Loaded trade:', parsed);
+                            }
                         } catch (e) {
-                            // Key doesn't exist yet, skip it
-                            return null;
+                            console.log('Skipping invalid trade key:', key);
                         }
-                    });
+                    }
                     
-                    const trades = (await Promise.all(tradePromises))
-                        .filter(trade => trade !== null)
-                        .sort((a, b) => b.timestamp - a.timestamp);
+                    trades.sort((a, b) => b.timestamp - a.timestamp);
                     
                     tradesList.innerHTML = '';
                     trades.forEach(trade => displayTrade(trade));
-                    console.log('Loaded', trades.length, 'trades');
+                    console.log('Successfully loaded', trades.length, 'trades');
+                } else {
+                    console.log('No trades found in storage');
                 }
             } catch (error) {
-                // Storage might not be ready yet, this is normal on first load
-                console.log('Storage not ready yet:', error.message);
+                console.log('Error loading trades:', error.message);
             }
         }
 
@@ -1350,17 +1473,49 @@
                     timestamp: timestamp
                 };
                 
+                console.log('Posting trade:', tradeData);
                 displayTrade(tradeData);
                 tradeOffering.value = '';
                 tradeSeeking.value = '';
                 playClickSound();
                 
-                // Store trade
-                try {
-                    const result = await window.storage.set(`trade:${timestamp}`, JSON.stringify(tradeData), true);
-                    console.log('Trade stored successfully:', result);
-                } catch (error) {
-                    console.error('Failed to store trade:', error);
+                // Store trade with retry
+                let attempts = 0;
+                let stored = false;
+                
+                while (!stored && attempts < 3) {
+                    try {
+                        const result = await window.storage.set(`trade:${timestamp}`, JSON.stringify(tradeData), true);
+                        console.log('Trade storage result:', result);
+                        
+                        if (result && result.key) {
+                            stored = true;
+                            console.log('✓ Trade stored successfully!');
+                            
+                            // Verify it was stored
+                            setTimeout(async () => {
+                                try {
+                                    const verify = await window.storage.get(`trade:${timestamp}`, true);
+                                    console.log('Verification check:', verify ? '✓ Trade verified in storage' : '✗ Trade not found');
+                                } catch (e) {
+                                    console.log('Verification failed:', e.message);
+                                }
+                            }, 500);
+                        } else {
+                            console.log('Storage returned null, retrying...');
+                            attempts++;
+                            await new Promise(resolve => setTimeout(resolve, 300));
+                        }
+                    } catch (error) {
+                        console.error('Storage attempt', attempts + 1, 'failed:', error.message);
+                        attempts++;
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                    }
+                }
+                
+                if (!stored) {
+                    console.error('✗ Failed to store trade after 3 attempts');
+                    alert('Trade may not be saved. Please try again.');
                 }
             }
         }
@@ -1374,11 +1529,16 @@
         });
 
         // Load trades and keep refreshing
+        console.log('Starting trade auto-refresh...');
         setInterval(() => {
             loadTrades();
         }, 3000);
         
-        loadTrades();
+        // Initial load with delay to ensure storage is ready
+        setTimeout(() => {
+            console.log('Initial trade load...');
+            loadTrades();
+        }, 1000);
 
         // Sound effects
         function playClickSound() {
